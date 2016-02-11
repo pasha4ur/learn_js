@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AJAX Document</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        html{
+            background-color: darkcyan;
+        }
+        body{
+            max-width: 70%;
+            min-height: 900px;
+            margin: 10px auto;
+            background-color: #fff;
+            padding: 2em 4em;
+            font: 18px/1.6 normal Roboto, sans-serif;
+        }
+        button{
+            display: inline-block;
+            margin-bottom: 1em;
+            font-size: 18px;
+            padding: 0.5em 1em;
+        }
+        #buttons{
+            margin: 2em 0;
+        }
+        #result{
+            border: 1px solid #ddd;
+            padding: 2em;
+        }
+        #hidden_result{
+            position: relative;
+        }
+        .hidden{
+            display: none;
+        }
+        #result.error{
+            border-color: firebrick;
+            color: firebrick;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h1>Some Document for Testing AJAX</h1>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae consequatur deserunt dicta, dolore dolorum excepturi fugiat id iure iusto laboriosam maxime nemo nisi numquam possimus quasi quisquam repudiandae. Eveniet, sequi?</p>
+</div>
+<div id="buttons">
+    <button class='testbtn1' data-address="ajax.html">Self</button>
+    <button class='testbtn1' data-address="1.txt">1.txt</button>
+    <button class='testbtn1' data-address="testcontent.php?name=Pavel&surname=Chur">PHP GET</button>
+    <button class='testbtn1' data-adress="error">Error</button>
+    <button onclick="sendJSON('json.php',{name: 'Вася', surname: 'Popov'}, 'result')">Send JSON</button>
+    <button onclick="sendJSONP({url:'jsonp.php', data:{name: 'Петя', surname: 'Popov'}, callback: 'callback1'})">Send JSONP</button>
+</div>
+<div id="hidden_result" class="hidden">
+    <h2>Result:</h2>
+    <p id="result"></p>
+    <button onclick='hideResult()'>Close</button>
+</div>
+<script>
+    const hiddenRes = document.querySelector('#hidden_result');
+
+    function displayResult(elem, message, error){
+        var error = error || false;
+        var outputEl = document.getElementById(elem);
+        hiddenRes.classList.remove('hidden');
+        if (error == true){
+            if( !outputEl.classList.contains('error')){
+                outputEl.classList.add('error');
+            }
+        } else{
+            outputEl.classList.remove('error');
+        }
+            outputEl.innerHTML = message;
+    }
+
+    function hideResult(){
+        hiddenRes.classList.add('hidden');
+    }
+    var btnsDiv = document.getElementById('buttons');
+    btnsDiv.addEventListener('click', checkbutton);
+
+    function checkbutton(e){
+        if(e.target.classList.contains('testbtn1')){
+            sendXHR(e);
+        }
+    }
+
+        function sendXHR(e){
+            var address= e.target.dataset['address'];
+            var msg ='';
+            var error = false;
+            var xhr= new XMLHttpRequest();
+            xhr.open('GET', address, true);
+            xhr.send();
+            xhr.onreadystatechange = function(){
+                displayResult('result','Loading', error);
+                if(xhr.readyState !=4){
+                    return;
+                }else {
+                    if(xhr.status != 200){
+                        msg = xhr.status + ': ' + xhr.statusText + '</br>';
+                        error = true;
+                    } else{
+                        msg = xhr.status + ': ' + xhr.statusText + '</br>' + xhr.responseText;
+                    }
+                }
+
+                displayResult('result', msg, error);
+            }
+        }
+
+        function sendJSON(adress, data, displayEl){
+            var data = 'data=' +JSON.stringify(data);
+            var resEl = document.getElementById(displayEl);
+            var error = false;
+            var msg ='';
+            var xhr= new XMLHttpRequest();
+            xhr.open('POST', adress, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(data);
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState !=4) {
+                    return;
+                }else{
+                    if(xhr.status != 200){
+                        msg = xhr.status + ': ' + xhr.statusText + '</br>';
+                        error = true;
+                    } else{
+                        var responseText = JSON.parse(xhr.responseText), response='';
+                        for (var cur in responseText ){
+                            response += cur + ': ' + responseText[cur] +'</br>';
+                        }
+                        msg = xhr.status + ': ' + xhr.statusText + '</br>' + response;
+                    }
+                }
+                displayResult('result', msg, error);
+            }
+        }
+
+        function addScript(src){
+            var elem = document.createElement("script");
+            elem.src = src;
+            document.head.appendChild(elem);
+        }
+
+        function sendJSONP(obj){
+            var data = obj.url + '?';
+            for (var val in obj.data){
+                data += val + '=' + encodeURIComponent(obj.data[val]) + '&';
+            }
+            data += 'callback=' + obj.callback;
+            console.log(data);
+            addScript(data);
+        }
+
+        function callback1(data){
+            var msg = '';
+            for (var val in data){
+                msg += val + ': ' + data[val] + '</br>';
+            }
+            document.getElementById('result').innerHTML = result;
+            displayResult('result', msg);
+        }
+</script>
+</body>
+</html>
