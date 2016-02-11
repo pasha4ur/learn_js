@@ -79,7 +79,6 @@
 
         function sendJSON(adress, data, displayEl){
             var data = 'data=' +JSON.stringify(data);
-            var resEl = document.getElementById(displayEl);
             var error = false;
             var msg ='';
             var xhr= new XMLHttpRequest();
@@ -101,7 +100,7 @@
                         msg = xhr.status + ': ' + xhr.statusText + '</br>' + response;
                     }
                 }
-                displayResult('result', msg, error);
+                displayResult(displayEl, msg, error);
             }
         }
 
@@ -126,7 +125,6 @@
             for (var val in data){
                 msg += val + ': ' + data[val] + '</br>';
             }
-            document.getElementById('result').innerHTML = result;
             displayResult('result', msg);
         }
 </script>
