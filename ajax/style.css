@@ -1,0 +1,38 @@
+*{
+    box-sizing: border-box;
+}
+html{
+    background-color: darkcyan;
+}
+body{
+    max-width: 70%;
+    min-height: 900px;
+    margin: 10px auto;
+    background-color: #fff;
+    padding: 2em 4em;
+    font: 18px/1.6 normal Roboto, sans-serif;
+}
+button{
+    display: inline-block;
+    margin-bottom: 1em;
+    font-size: 18px;
+    padding: 0.5em 1em;
+}
+#buttons{
+    margin: 2em 0;
+}
+#result{
+    border: 1px solid #ddd;
+    padding: 2em;
+}
+#hidden_result{
+    position: relative;
+}
+.hidden{
+    display: none;
+}
+#result.error{
+    border-color: firebrick;
+    color: firebrick;
+    font-weight: 900;
+}
